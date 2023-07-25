@@ -9,6 +9,7 @@ class VKAuthentication:
         self.v_api = None
         self.group_id = None
         self.owner_id = None
+        self.domain = None
 
     def settings_read(self, path_env):
         if os.path.isfile(path_env):
@@ -17,5 +18,6 @@ class VKAuthentication:
             self.v_api = os.getenv("VK_API")
             self.group_id = os.getenv("VK_GROUP_ID")
             self.owner_id = os.getenv("VK_OWNER_ID")
+            self.domain = os.getenv("VK_DOMAIN")
         else:
             raise OSError
