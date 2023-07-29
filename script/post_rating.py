@@ -16,8 +16,9 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
     count = 100
     vk_wall = wall_method.WallMethod()
     post_catalog = list()
+    day_post_flag = True
 
-    while True:
+    while day_post_flag:
         post_wall_info = vk_wall.post_wall(vk_auth, offset, count)
         if post_wall_info:
             post_info: list = post_wall_info.get("response").get("items")
@@ -28,6 +29,7 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
             if date_start >= date_post <= date_finish:
                 post_catalog.append(post)
             elif date_post < date_start:
+                day_post_flag = False
                 break
         offset += count
     return post_catalog
