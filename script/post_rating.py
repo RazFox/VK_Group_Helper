@@ -26,7 +26,7 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
             break
         for post in post_info:
             date_post = datetime.datetime.fromtimestamp(post.get("date"))
-            if date_start >= date_post <= date_finish:
+            if date_start <= date_post <= date_finish:
                 post_catalog.append(post)
             elif date_post < date_start:
                 day_post_flag = False
