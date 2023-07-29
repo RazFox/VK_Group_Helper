@@ -2,11 +2,13 @@ from lib import wall_method
 import datetime
 
 
-def posts_one_month(date_month: datetime, vk_auth) -> list:
+def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
     """
-    Gets a list of group wall posts for the specified month.
+    Gets a list of posts on the group's wall for the specified period.
+    The start date and end date are included in the period.
 
-    :param date_month: Date of the first day of the month. Must contain at least the month and year.
+    :param date_start: The start date of the period. Must contain day, month, year.
+    :param date_finish: End date of the period. Must contain day, month, year.
     :param vk_auth: The VK Authentication object contains data for authentication and access to the method.
     :return: List of dictionaries with posts.
     """
@@ -23,9 +25,11 @@ def posts_one_month(date_month: datetime, vk_auth) -> list:
             break
         for post in post_info:
             date_post = datetime.datetime.fromtimestamp(post.get("date"))
-            if (date_post.month == date_month.month) and (date_post.year == date_month.year):
+            if date_start >= date_post <= date_finish:
                 post_catalog.append(post)
-            elif date_post < date_month:
+            elif date_post < date_start:
                 break
         offset += count
     return post_catalog
+
+
