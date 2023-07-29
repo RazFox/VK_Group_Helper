@@ -35,3 +35,38 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
     return post_catalog
 
 
+def posting_data_cleaner(post_data: list[dict]) -> list[dict]:
+    """
+    Iterate over the list with data on posts.
+    Using the keys, we get data from the post and collect a new list of dictionaries.
+
+    Contains data (keys):
+        Post ID (messages) - post_id
+        Number of comments - comments_count
+        Number of views - views_count
+        Number of likes - likes_count
+        Total number of reposts - reposts_count
+        Number of reposts per wall - reposts_wall
+        Number of reposts per message - reposts_mail
+        Post text (messages) - text_message
+        Post date - date
+
+    :param post_data: List with dictionaries. Post data
+    :return:  List of dictionaries. Cleared and only selected post data
+    """
+    post_list = list()
+    for post in post_data:
+        post_list.append(
+            {
+                "post_id": post.get("from_id"),
+                "comments_count": post.get("comments").get("count"),
+                "views_count": post.get("views").get("count"),
+                "likes_count": post.get("likes").get("count"),
+                "reposts_count": post.get("reposts").get("count"),
+                "reposts_wall": post.get("reposts").get("wall_count"),
+                "reposts_mail": post.get("reposts").get("mail_count"),
+                "text_message": post.get("text"),
+                "date": post.get("date")
+            }
+        )
+    return post_list
