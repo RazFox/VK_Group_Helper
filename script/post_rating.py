@@ -1,3 +1,5 @@
+from prettytable import PrettyTable
+
 from lib import wall_method
 import datetime
 
@@ -12,8 +14,8 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
     :param vk_auth: The VK Authentication object contains data for authentication and access to the method.
     :return: List of dictionaries with posts.
     """
-    offset = 0
-    count = 100
+    offset = 0  # Starting point for iterating over posts
+    count = 100  # Max value for method 100
     vk_wall = wall_method.WallMethod()
     post_catalog = list()
     day_post_flag = True
@@ -21,7 +23,7 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
     while day_post_flag:
         post_wall_info = vk_wall.post_wall(vk_auth, offset, count)
         if post_wall_info:
-            post_info: list = post_wall_info.get("response").get("items")
+            post_info: list[dict] = post_wall_info.get("response").get("items")
         else:
             break
         for post in post_info:
@@ -30,12 +32,15 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
                 post.update({"url": "https://vk.com/{}?w=wall{}_{}".format(
                     vk_auth.domain,
                     vk_auth.owner_id,
-                    post.get("id"))})
+                    post.get("id"))})  # Compiling a link
                 post_catalog.append(post)
             elif date_post < date_start:
                 day_post_flag = False
                 break
-        offset += count
+        offset += count  # Change the indent to the number of received posts from the request
+    if day_post_flag:
+        # TODO: We need to add handling of situations where the loop is terminated without changing the day_post_flag flag: situations when the get method will return an error.
+        pass
     return post_catalog
 
 
@@ -75,3 +80,44 @@ def posting_data_cleaner(post_data: list[dict]) -> list[dict]:
             }
         )
     return post_list
+
+
+def table_create(list_table: list[dict]) -> None:
+    """
+    Compiling a table using ASCII characters.
+    Prepares and creates a table with previously obtained data. Prints it to the console.
+
+
+    :param list_table: List with dictionaries containing data on posts.
+    :return: None
+    """
+    table = PrettyTable()
+    table.field_names = [
+        "Post ID",
+        "Comments Count",
+        "Views Count",
+        "Likes Count",
+        "Repost Count",
+        "Repost Wall",
+        "Repost Mail",
+        "Text Message",
+        "Date",
+        "Url"
+    ]
+
+    for line in list_table:
+        table.add_row(
+            [
+                line.get("post_id"),
+                line.get("comments_count"),
+                line.get("views_count"),
+                line.get("likes_count"),
+                line.get("reposts_count"),
+                line.get("reposts_wall"),
+                line.get("reposts_mail"),
+                line.get("text_message"),
+                datetime.datetime.fromtimestamp(line.get("date")),
+                line.get("url")
+            ]
+        )
+    print(table)
