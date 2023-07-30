@@ -27,6 +27,10 @@ def posts_period(date_start: datetime, date_finish: datetime, vk_auth) -> list:
         for post in post_info:
             date_post = datetime.datetime.fromtimestamp(post.get("date"))
             if date_start <= date_post <= date_finish:
+                post.update({"url": "https://vk.com/{}?w=wall{}_{}".format(
+                    vk_auth.domain,
+                    vk_auth.owner_id,
+                    post.get("id"))})
                 post_catalog.append(post)
             elif date_post < date_start:
                 day_post_flag = False
@@ -58,7 +62,7 @@ def posting_data_cleaner(post_data: list[dict]) -> list[dict]:
     for post in post_data:
         post_list.append(
             {
-                "post_id": post.get("from_id"),
+                "post_id": post.get("id"),
                 "comments_count": post.get("comments").get("count"),
                 "views_count": post.get("views").get("count"),
                 "likes_count": post.get("likes").get("count"),
@@ -66,7 +70,8 @@ def posting_data_cleaner(post_data: list[dict]) -> list[dict]:
                 "reposts_wall": post.get("reposts").get("wall_count"),
                 "reposts_mail": post.get("reposts").get("mail_count"),
                 "text_message": post.get("text"),
-                "date": post.get("date")
+                "date": post.get("date"),
+                "url": post.get("url")
             }
         )
     return post_list
